@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   password: { required: true, type: String },
   profile_image: { type: String },
   type: { required: true, type: String, default: "user"},
+  status: { required: true, type: Boolean, default: false},
   created_at: { type: Date },
   updated_at: { type: Date },
 });

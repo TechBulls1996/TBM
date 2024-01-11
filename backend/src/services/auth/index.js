@@ -28,7 +28,7 @@ export const loginRouteHandler = async (req, res, email, password) => {
     if (validPassword) {
       // Generate JWT token
       const token = jwt.sign(
-        { id: foundUser.id, email: foundUser.email },
+        { id: foundUser.id, email: foundUser.email, type: foundUser.type },
         "token",
         {
           expiresIn: "24h",
