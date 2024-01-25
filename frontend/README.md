@@ -20,6 +20,6 @@ It runs the Production build at default port 3000.
 
 ### config files
 
-- sudo nano /etc/nginx/conf.d/medimapping.com.conf
-- sudo nano /etc/nginx/conf.d/api.medimapping.com.conf
+- sudo nano /etc/nginx/conf.d/domain.com.conf
+- sudo nano /etc/nginx/conf.d/api.domain.com.conf
 - sudo nano /etc/nginx/nginx.conf

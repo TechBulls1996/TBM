@@ -18,7 +18,7 @@ router.use((req: any, res: any, next: () => void) => {
 
 // define the home page route
 router.get("/", (req: any, res: any) => {
-  res.json("Medimapping Api index page.");
+  res.json("True Digital Broadcaste Api index page.");
 });
 
 //auth routes

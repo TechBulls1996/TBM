@@ -52,7 +52,7 @@ const Contact = () => {
                       <h4 className="text-uppercase m-0">Email</h4>
                       <hr className="my-4" />
                       <div className="small text-black-50">
-                        <NavLink to={"mailto:contact@medimapping.com"}>
+                        <NavLink to={"mailto:contact@example.com"}>
                           contact@example.com
                         </NavLink>
                       </div>
