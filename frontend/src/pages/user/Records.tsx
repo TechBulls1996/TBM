@@ -1,6 +1,8 @@
 import Sidebar from "../../components/user/Sidebar";
 import { MedicalRecordCards } from "../../components/user/UserCards";
 import SearchBar from "../../components/common/Search";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRightLong } from "@fortawesome/free-solid-svg-icons";
 
 const Records = () => {
   return (
@@ -11,7 +13,7 @@ const Records = () => {
             <div className="col-sm-3 p-0">
               <Sidebar />
             </div>
-            <div className="col-sm-6 pt-4">
+            <div className="col-sm-9 pt-4">
               <header className=" d-flex align-items-center">
                 <h3 className="title-md">My Records</h3>
               </header>
@@ -59,9 +61,54 @@ const Records = () => {
                   </div>
                 </div>
               </div>
-              {/* start listing */}
-              <div className="row">
-                <MedicalRecordCards />
+             
+              <div className="row vital-row">
+                <div className="col-sm-12 mt-2">
+                  <div className="card">
+                    <div className="head w-100">
+                      <h4>History</h4>
+                      <p>
+                        <FontAwesomeIcon
+                          icon={faRightLong}
+                          className="text-success"
+                        />{" "}
+                        Last 30 Day's Records
+                      </p>
+
+                      <div className="table-wrap w-100">
+                        <table className="table table-responsive">
+                          <thead>
+                            <tr>
+                              <td className="head">Record</td>
+                              <td className="head">First</td>
+                              <td className="head">Last</td>
+                              <td className="head">Handle</td>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>1</td>
+                              <td>Mark</td>
+                              <td>Otto</td>
+                              <td>@mdo</td>
+                            </tr>
+                            <tr>
+                              <td>2</td>
+                              <td>Jacob</td>
+                              <td>Thornton</td>
+                              <td>@fat</td>
+                            </tr>
+                            <tr>
+                              <td>3</td>
+                              <td colSpan={2}>Larry the Bird</td>
+                              <td>@twitter</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             
