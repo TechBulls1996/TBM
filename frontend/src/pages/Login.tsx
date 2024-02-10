@@ -22,17 +22,19 @@ const Login = () => {
     UserLogin({ email, password })
       .then((res) => {
         if (res?.status) {
+          const type = res?.user.roles[0].type;
           //success
           dispatch(
             setAllState({
-              loginTime: moment(),
+              loginTime: moment().format('YYYY-MM-DD HH:mm:ss'),
               authStatus: true,
               user: res?.user,
+              type: type,
             })
           );
           setAuthCookie(res?.token);
           if (rememberMe) localStorage.setItem("remeberMe", "true");
-          navigate("/user");
+          navigate(`/${type}`);
         } else if (res && res.errors) {
           setErrors(res?.errors);
         } else {

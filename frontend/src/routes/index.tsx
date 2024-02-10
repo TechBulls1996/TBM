@@ -15,6 +15,8 @@ import Logout from "../pages/Logout";
 import ForgotPassword from "../pages/ForgotPassword";
 import Play from "../pages/user/Play";
 import AdminDashboard from "../pages/admin/AdminDashboard";
+import AdminManageClients from "../pages/admin/AdminManageClients";
+import AdminManageUsers from "../pages/admin/AdminManageUsers";
 
 const MainLayout = () => {
   const location = useLocation();
@@ -120,8 +122,12 @@ const ROUTES = [
       },
       
       {
-        path: "records",
-        element: <Records />,
+        path: "clients",
+        element: <AdminManageClients />,
+      },
+      {
+        path: "users",
+        element: <AdminManageUsers />,
       },
       
     ],

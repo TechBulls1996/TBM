@@ -42,7 +42,7 @@ const Header = () => {
       }
     };
     updateState(authState);
-  }, [authState, dispatch, navigate]);
+  }, [dispatch, navigate]);
 
   return (
     <>

@@ -65,16 +65,7 @@ const Records = () => {
               <div className="row vital-row">
                 <div className="col-sm-12 mt-2">
                   <div className="card">
-                    <div className="head w-100">
-                      <h4>History</h4>
-                      <p>
-                        <FontAwesomeIcon
-                          icon={faRightLong}
-                          className="text-success"
-                        />{" "}
-                        Last 30 Day's Records
-                      </p>
-
+                    
                       <div className="table-wrap w-100">
                         <table className="table table-responsive">
                           <thead>
@@ -106,7 +97,7 @@ const Records = () => {
                           </tbody>
                         </table>
                       </div>
-                    </div>
+                    
                   </div>
                 </div>
               </div>
