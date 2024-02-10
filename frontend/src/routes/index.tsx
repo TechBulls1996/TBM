@@ -1,4 +1,6 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, Navigate } from "react-router-dom";
+import { getAuthCookie } from "../helpers";
+
 import Header from "../components/Header";
 import ErrorPage from "../pages/error-page";
 import Home from "../pages/Home";
@@ -18,8 +20,22 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminManageClients from "../pages/admin/AdminManageClients";
 import AdminManageUsers from "../pages/admin/AdminManageUsers";
 
+
+const useAuth = () => {
+  // Your authentication logic here
+  return getAuthCookie();
+};
+
 const MainLayout = () => {
+  const isAuthenticated = useAuth();
   const location = useLocation();
+
+  //check auth
+  if(!isAuthenticated) {
+    return <Navigate to="/login" />
+  }
+
+  //hide routes header, sidebar or footer
   const routesToHide = ["/user/play"];
   const hidenRoutes = routesToHide.some(route =>
     location.pathname.startsWith(route)
@@ -35,10 +51,18 @@ const MainLayout = () => {
   );
 }
 
+const OuterLayout = () => {
+  return (<>
+   <Header />
+     <Outlet />
+   <Footer />  
+  </>);
+}
+
 const ROUTES = [
   {
     path: "/",
-    element: <MainLayout />,
+    element: <OuterLayout />,
     errorElement: <ErrorPage />,
     children: [
       {

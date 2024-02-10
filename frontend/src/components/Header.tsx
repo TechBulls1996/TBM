@@ -135,7 +135,7 @@ const Header = () => {
                             </span>
                             <span>
                               {authState?.user.name} <br />
-                              <span>User</span>
+                              <span className="text-capitalize">{ authState.user?.roles?.[0]?.type ?? 'User'}</span>
                             </span>
                           </NavLink>
 

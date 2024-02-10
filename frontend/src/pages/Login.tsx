@@ -34,7 +34,8 @@ const Login = () => {
           );
           setAuthCookie(res?.token);
           if (rememberMe) localStorage.setItem("remeberMe", "true");
-          navigate(`/${type}`);
+          //navigate to panel
+          navigate(`/${type ==='user'?'user/play':'admin'}`);
         } else if (res && res.errors) {
           setErrors(res?.errors);
         } else {
