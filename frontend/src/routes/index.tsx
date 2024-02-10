@@ -1,5 +1,5 @@
 import { Outlet, useLocation, Navigate } from "react-router-dom";
-import { getAuthCookie } from "../helpers";
+import { getAuthCookie, getUserRole } from "../helpers";
 
 import Header from "../components/Header";
 import ErrorPage from "../pages/error-page";
@@ -19,20 +19,38 @@ import Play from "../pages/user/Play";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminManageClients from "../pages/admin/AdminManageClients";
 import AdminManageUsers from "../pages/admin/AdminManageUsers";
+import OuterHeader from "../components/OuterHeader";
 
 
 const useAuth = () => {
   // Your authentication logic here
-  return getAuthCookie();
+  const token = getAuthCookie();
+  if(token){
+    return {
+      role: getUserRole(),
+    }
+  }
+  return false;
 };
 
 const MainLayout = () => {
   const isAuthenticated = useAuth();
   const location = useLocation();
+  const isAdmin = isAuthenticated && isAuthenticated?.role === "admin";
 
   //check auth
   if(!isAuthenticated) {
     return <Navigate to="/login" />
+  }
+  
+  // Check if the user is trying to access admin routes without admin role
+  if (location.pathname.startsWith("/admin") && !isAdmin) {
+    return <Navigate to="/user" />;
+  }
+
+  // Check if the user is trying to access user routes without user role
+  if (location.pathname.startsWith("/user") && isAdmin) {
+    return <Navigate to="/" />;
   }
 
   //hide routes header, sidebar or footer
@@ -53,7 +71,7 @@ const MainLayout = () => {
 
 const OuterLayout = () => {
   return (<>
-   <Header />
+   <OuterHeader />
      <Outlet />
    <Footer />  
   </>);

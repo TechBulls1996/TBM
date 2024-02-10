@@ -26,6 +26,14 @@ export const setServiceHeaders = () => {
   };
 };
 
+export const getUserRole = () => {
+  const user = localStorage.getItem('user');
+  if(user){
+    return JSON.parse(user).roles?.[0]?.type;
+  }
+  return false;
+}
+
 export const getTimeAgo = (time: any) => {
   return moment(time).fromNow();
 };
