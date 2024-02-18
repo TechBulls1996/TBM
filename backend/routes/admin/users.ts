@@ -12,9 +12,6 @@ type QueryType = {
 };
 
 usersRouter.get("/", async (req, res) => {
-    
-    console.log("Here::::::", typeof req.query.page);
-
     const { pageSize = '10', page = '1' }: QueryType = req.query;
     const skip: number = (parseInt(page) - 1) * parseInt(pageSize);
 
@@ -27,22 +24,32 @@ usersRouter.get("/", async (req, res) => {
                 $project: {
                     _id: 1,
                     name: 1,
+                    email:1,
                     image: 1,
                     city: 1,
                     state: 1,
-                    type: 1,
+                    roles: 1,
+                    address: 1,
+                    pinCode: 1,
+                    mobile: 1,
                 },
             },
+            { $unwind: "$roles" },
+            { $match: { "roles.type": "user" } }
         ]);
 
         if (users.length === 0) {
             return res.status(401).json(ApiFailedResponse(FailedMsg));
         }
 
+         // Check if there are more users beyond this page
+         const hasNextPage = users.length === parseInt(pageSize);
+
         return res.json({
             status: true,
             message: SuccessMsg,
             data: users,
+            hasNextPage,
         });
     } catch (error) {
         console.error(error);

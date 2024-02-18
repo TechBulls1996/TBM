@@ -27,23 +27,17 @@ const AdminManageUsers = () => {
   const [fullName, setFullName]: any = useState("");
   const [confirmPass, setConfirmPass]: any = useState("");
   const [phone, setPhone]: any = useState("");
-
   const [dob, setDob]: any = useState("");
   const [gender, setGender]: any = useState("");
-  const [bloodGroup, setBloodGroup]: any = useState("");
   const [country, setCountry]: any = useState({
     code: "IN",
     label: "India",
     value: "India",
   });
-  
   const [state, setState]: any = useState("");
   const [city, setCity]: any = useState("");
   const [address, setAddress]: any = useState("");
   const [pinCode, setPinCode]: any = useState("");
-  const [terms, setTerms]: any = useState(true);
-
- 
 
   //const [modalStatus, setModalStatus] = useState(false);
   const [users, setUsers]: any = useState([]);
@@ -65,8 +59,8 @@ const AdminManageUsers = () => {
             setUsers([...users, ...res.data]);
           }
 
-          setNextPage(res.pagination.nextPage);
-          if (res.pagination.nextPage) {
+          setNextPage(res.nextPage);
+          if (res.nextPage) {
             setPage(page + 1);
           }
         } else {
@@ -75,10 +69,9 @@ const AdminManageUsers = () => {
         }
       });
     };
-    const onRegister = (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      
   
+  const onRegister = (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
       UserRegister({
         email,
         password,
@@ -87,7 +80,6 @@ const AdminManageUsers = () => {
         phone,
         dob,
         gender,
-      
         country,
         state,
         city,
@@ -129,159 +121,20 @@ const AdminManageUsers = () => {
               <div className="row vital-row">
                 <div className="col-sm-12 mt-2">
                   <div className="card">
-                    <div className="head w-100">
-                     
-                    <div className="detailcheck-sec">
-                            <div className="row">
+                    <div className="head w-100">    
+                      <div className="detailcheck-sec">
+                        <div className="row">
                             <div className="col-sm-12">
                                 <label className="form-label">Manage Users:</label>
                             </div>
                             <div className="col-md-10 mb-4 d-flex">
                                 <SearchBar placeholder="Search Records..." />
                             </div>
-                            
                             <div className="col-md-2">
-                            <Button variant="primary" onClick={handleShow}>
-        Add user
-      </Button>
-
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Create User</Modal.Title>
-        </Modal.Header>
-        <Modal.Body> 
-        <form className="row g-3" onSubmit={(e) => onRegister(e)} method="post">
-  <div className="col-md-6">
-  <input
-                    type="text"
-                    className="form-control"
-                    id="fullname"
-                    name="fullname"
-                    placeholder="Enter Full Name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required
-                  />
-                  </div>
-  <div className="col-md-6">
-  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    name="email"
-                    placeholder="Enter Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-  </div>
-  <div className="col-md-6">
-  <input
-                    type=""
-                    className="form-control"
-                    id="number"
-                    name="number"
-                    placeholder="Enter phone no."
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                  />
-  </div>
-  <div className="col-md-6">
-  <input
-                    type="password"
-                    className="form-control"
-                    id="password"
-                    name="password"
-                    placeholder="Enter password"
-                    value={password}
-                    required
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-  </div>
-  <div className="col-md-6">
-  <label  className="form-label">Gender</label>
-    <select
-                    className="form-control"
-                    name="gender"
-                    id="gender"
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value)}
-                  >
-                    <option value="" disabled={true}>
-                      Select Gender
-                    </option>
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
-                  </select>
-  </div>
-  <div className="col-md-6">
-  <label  className="form-label">Country</label>
-  <CountrySelect
-                    name="country"
-                    id="country"
-                    defaultValue={country}
-                    onChange={(e: any) => setCountry(e)}
-                    placeholder="Select Country"
-                  />
-  </div>
-  <div className="col-md-6">
-  <StateSelect
-                    name="state"
-                    id="state"
-                    country={country}
-                    defaultValue={state}
-                    onChange={(e: any) => setState(e)}
-                    placeholder="Select State"
-                    required
-                  />
-  </div>
-  <div className="col-md-6">
-  <CitySelect
-                    name="state"
-                    id="state"
-                    state={state}
-                    defaultValue={city}
-                    onChange={(e: any) => setCity(e)}
-                    placeholder="Select City"
-                  required
-                  />
-  </div>
-  <div className="col-md-6">
-  <input
-                    type="text"
-                    className="form-control"
-                    id="address"
-                    name="address"
-                    placeholder="Local Address"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    required
-                  />
-  </div>
-  <div className="col-md-6">
-  <input
-                    type="number"
-                    className="form-control"
-                    id="pincode"
-                    name="pincode"
-                    placeholder="Pin Code"
-                    value={pinCode}
-                    onChange={(e) => setPinCode(e.target.value)}
-       required
-       />
-  </div>
-  <div className="col-12">
-    <button type="submit" className="btn btn-primary" >Create user</button>
-  </div>
-</form>
-        </Modal.Body>
-       
-      </Modal>
+                               <Button variant="dark" onClick={handleShow}>Add user</Button>
                             </div>
-                            </div>
-                    </div> 
+                        </div>
+                      </div> 
 
                     {globalError?.length > 0 && (
                       <MyAlert message={globalError} alertType="danger" />
@@ -290,30 +143,28 @@ const AdminManageUsers = () => {
                       <table className="table table-responsive">
                         <thead>
                             <tr>
-                              <td className="head">Record</td>
-                              <td className="head">First</td>
-                              <td className="head">Last</td>
-                              <td className="head">Handle</td>
+                              <td className="head">Sno</td>
+                              <td className="head">Name</td>
+                              <td className="head">Email</td>
+                              <td className="head">Mobile</td>
+                              <td className="head">Address</td>
+                              <td className="head">Pincode</td>
                             </tr>
                         </thead>
                         <tbody>
+                          { users?.map((user: any, index: number) => 
+                            <>
                             <tr>
-                              <td>1</td>
-                              <td>Mark</td>
-                              <td>Otto</td>
-                              <td>@mdo</td>
+                              <td> { ++index }</td>
+                              <td>{ user.name }</td>
+                              <td>{ user.email }</td>
+                              <td>{ user.mobile }</td>
+                              <td>{ user.city.value }</td>
+                              <td>{ user.pinCode }</td>
                             </tr>
-                            <tr>
-                              <td>2</td>
-                              <td>Jacob</td>
-                              <td>Thornton</td>
-                              <td>@fat</td>
-                            </tr>
-                            <tr>
-                              <td>3</td>
-                              <td colSpan={2}>Larry the Bird</td>
-                              <td>@twitter</td>
-                            </tr>
+                            
+                            </>
+                            )}
                         </tbody>
                         
                       </table>
@@ -337,6 +188,141 @@ const AdminManageUsers = () => {
         </div>
       </div>
     </section>
+
+    {/* Create User Modal */}
+    <Modal show={show} onHide={handleClose} size={'lg'}>
+      <Modal.Header closeButton>
+        <Modal.Title>Create User</Modal.Title>
+      </Modal.Header>
+      <Modal.Body> 
+      <form className="row g-3" onSubmit={(e) => onRegister(e)} method="post">
+                      <div className="col-md-6">
+                        <input
+                                        type="text"
+                                        className="form-control"
+                                        id="fullname"
+                                        name="fullname"
+                                        placeholder="Enter Full Name"
+                                        value={fullName}
+                                        onChange={(e) => setFullName(e.target.value)}
+                                        required
+                                      />
+                                      </div>
+                      <div className="col-md-6">
+                      <input
+                                        type="email"
+                                        className="form-control"
+                                        id="email"
+                                        name="email"
+                                        placeholder="Enter Email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                      />
+                      </div>
+                      <div className="col-md-6">
+                      <input
+                                        type=""
+                                        className="form-control"
+                                        id="number"
+                                        name="number"
+                                        placeholder="Enter phone no."
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value)}
+                                        required
+                                      />
+                      </div>
+                      <div className="col-md-6">
+                      <input
+                                        type="password"
+                                        className="form-control"
+                                        id="password"
+                                        name="password"
+                                        placeholder="Enter password"
+                                        value={password}
+                                        required
+                                        onChange={(e) => setPassword(e.target.value)}
+                                      />
+                      </div>
+                      <div className="col-md-6">
+                     
+                        <select
+                                        className="form-control"
+                                        name="gender"
+                                        id="gender"
+                                        value={gender}
+                                        onChange={(e) => setGender(e.target.value)}
+                                      >
+                                        <option value="" disabled={true}>
+                                          Select Gender
+                                        </option>
+                                        <option>Male</option>
+                                        <option>Female</option>
+                                        <option>Other</option>
+                                      </select>
+                      </div>
+                      <div className="col-md-6">
+                      
+                      <CountrySelect
+                                        name="country"
+                                        id="country"
+                                        defaultValue={country}
+                                        onChange={(e: any) => setCountry(e)}
+                                        placeholder="Select Country"
+                                      />
+                      </div>
+                      <div className="col-md-6">
+                      <StateSelect
+                                        name="state"
+                                        id="state"
+                                        country={country}
+                                        defaultValue={state}
+                                        onChange={(e: any) => setState(e)}
+                                        placeholder="Select State"
+                                        required
+                                      />
+                      </div>
+                      <div className="col-md-6">
+                      <CitySelect
+                                        name="state"
+                                        id="state"
+                                        state={state}
+                                        defaultValue={city}
+                                        onChange={(e: any) => setCity(e)}
+                                        placeholder="Select City"
+                                      required
+                                      />
+                      </div>
+                      <div className="col-md-6">
+                      <input
+                                        type="text"
+                                        className="form-control"
+                                        id="address"
+                                        name="address"
+                                        placeholder="Local Address"
+                                        value={address}
+                                        onChange={(e) => setAddress(e.target.value)}
+                                        required
+                                      />
+                      </div>
+                      <div className="col-md-6">
+                      <input
+                                        type="number"
+                                        className="form-control"
+                                        id="pincode"
+                                        name="pincode"
+                                        placeholder="Pin Code"
+                                        value={pinCode}
+                                        onChange={(e) => setPinCode(e.target.value)}
+                          required
+                          />
+                      </div>
+                      <div className="col-12">
+                        <button type="submit" className="btn btn-primary" >Create user</button>
+                      </div>
+                    </form>
+      </Modal.Body>
+    </Modal>
   </>)
 }
 export default AdminManageUsers

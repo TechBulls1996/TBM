@@ -38,33 +38,37 @@ const MainLayout = () => {
   const location = useLocation();
   const isAdmin = isAuthenticated && isAuthenticated?.role === "admin";
 
+  /*
+   Remove auth for now - Temporary
+
   //check auth
-  // if(!isAuthenticated) {
-  //   return <Navigate to="/login" />
-  // }
+  if(!isAuthenticated) {
+    return <Navigate to="/login" />
+  }
   
-  // // Check if the user is trying to access admin routes without admin role
-  // if (location.pathname.startsWith("/admin") && !isAdmin) {
-  //   return <Navigate to="/user" />;
-  // }
+  // Check if the user is trying to access admin routes without admin role
+  if (location.pathname.startsWith("/admin") && !isAdmin) {
+    return <Navigate to="/user" />;
+  }
 
-  // // Check if the user is trying to access user routes without user role
-  // if (location.pathname.startsWith("/user") && isAdmin) {
-  //   return <Navigate to="/" />;
-  // }
+  // Check if the user is trying to access user routes without user role
+  if (location.pathname.startsWith("/user") && isAdmin) {
+    return <Navigate to="/" />;
+  }
+  */
 
-  // //hide routes header, sidebar or footer
-  // const routesToHide = ["/user/play"];
-  // const hidenRoutes = routesToHide.some(route =>
-  //   location.pathname.startsWith(route)
-  // );
+  //hide routes header, sidebar or footer
+  const routesToHide = ["/user/play"];
+  const hidenRoutes = routesToHide.some(route =>
+    location.pathname.startsWith(route)
+  );
 
   return (
     <>
-      {/* { !hidenRoutes &&<Loader /> }
-      { !hidenRoutes && <Header />} */}
+      { !hidenRoutes &&<Loader /> }
+      { !hidenRoutes && <Header />}
       <Outlet />
-      {/* { !hidenRoutes && <Footer />} */}
+      { !hidenRoutes && <Footer />}
     </>
   );
 }
