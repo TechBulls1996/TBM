@@ -1,22 +1,25 @@
 import { useEffect, useState ,FormEvent} from "react";
+import {useDispatch} from "react-redux"
+import { useNavigate } from "react-router-dom";
+import { Button, Modal, ButtonGroup } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import moment from "moment";
+
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import SearchBar from "../../components/common/Search";
 import { GetUsers } from "../../services/user/ProfileServices";
 import { getErrorMsg } from "../../helpers";
 import MyAlert from "../../components/common/Alert";
 import { MyButton } from "../../components/common/MyButton";
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
 import { UserRegister } from "../../services/AuthServices";
-import {useDispatch} from "react-redux"
-import { useNavigate } from "react-router-dom";
 import { setAllState } from "../../app/authActions";
 import {setAuthCookie } from "../../helpers"
 import CountrySelect, {
   CitySelect,
   StateSelect,
 } from "../../components/common/AdvanceSelect";
-import moment from "moment";
+
 
 const AdminManageUsers = () => {
   const dispatch = useDispatch();
@@ -39,7 +42,6 @@ const AdminManageUsers = () => {
   const [address, setAddress]: any = useState("");
   const [pinCode, setPinCode]: any = useState("");
 
-  //const [modalStatus, setModalStatus] = useState(false);
   const [users, setUsers]: any = useState([]);
   const [page, setPage]: any = useState(1);
   const [nextPage, setNextPage]: any = useState(true);
@@ -104,6 +106,7 @@ const AdminManageUsers = () => {
       });
      
     };
+
     useEffect(() => {
       handleRequest();
     }, [page]);
@@ -149,6 +152,7 @@ const AdminManageUsers = () => {
                               <td className="head">Mobile</td>
                               <td className="head">Address</td>
                               <td className="head">Pincode</td>
+                              <td className="head"></td>
                             </tr>
                         </thead>
                         <tbody>
@@ -161,6 +165,17 @@ const AdminManageUsers = () => {
                               <td>{ user.mobile }</td>
                               <td>{ user.city.value }</td>
                               <td>{ user.pinCode }</td>
+                              <td>
+                              <ButtonGroup aria-label="User Actions">
+                                <Button variant="outline-info" size="sm" className="btn-compact" >
+                                  <FontAwesomeIcon icon={faEdit} /> Edit
+                                </Button>
+                                <Button variant="outline-danger" size="sm" className="btn-compact">
+                                  <FontAwesomeIcon icon={faTrashAlt} /> Delete
+                                </Button>
+                              </ButtonGroup>
+                              </td>
+                              
                             </tr>
                             
                             </>
