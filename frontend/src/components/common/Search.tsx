@@ -4,13 +4,13 @@ interface searchBarProps {
   placeholder?: string;
   extraClass?: string;
   extraStyle?: any;
+  handleSearch?: any;
+  search?: string;
 }
 
 const SearchBar = (props: searchBarProps) => {
-  const { placeholder } = props;
-  const handleChange = (e: any) => {
-    e.preventDefault();
-  };
+  const { placeholder, handleSearch, search } = props;
+ 
   return (
     <div
       className={`searchbox ${props.extraClass ? props?.extraClass : ""}`}
@@ -22,8 +22,8 @@ const SearchBar = (props: searchBarProps) => {
           type="text"
           id="formBasicSearch"
           className="form-control"
-          value=""
-          onChange={(e) => handleChange(e)}
+          value={search}
+          onChange={e => handleSearch(e.target.value)}
         />
       </div>
       <button type="submit" className="btn btn-transparent">

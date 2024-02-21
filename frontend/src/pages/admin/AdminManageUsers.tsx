@@ -48,12 +48,15 @@ const AdminManageUsers = () => {
   const [errors, setErrors]: any = useState([]);
   const pageSize:number = 10;
   const [show, setShow] = useState(false);
+  const [search, setSearch] = useState('');
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  
+  
 
   const handleRequest = () => {
-      return GetUsers({ page, pageSize }).then((res) => {
+      return GetUsers({ page, pageSize, search }).then((res) => {
         if (res?.status) {
           if (page === 1) {
             setUsers(res.data);
@@ -111,6 +114,13 @@ const AdminManageUsers = () => {
       handleRequest();
     }, [page]);
 
+    useEffect(() => {
+      const timeoutId = setTimeout(() => {
+        handleRequest();
+      }, 500);
+      return () => clearTimeout(timeoutId);
+    }, [search]);
+
     const globalError = getErrorMsg(errors, "global");
     
     return (<>
@@ -131,7 +141,7 @@ const AdminManageUsers = () => {
                                 <label className="form-label">Manage Users:</label>
                             </div>
                             <div className="col-md-10 mb-4 d-flex">
-                                <SearchBar placeholder="Search Records..." />
+                                <SearchBar placeholder="Search Records..." handleSearch={setSearch} search={search}/>
                             </div>
                             <div className="col-md-2">
                                <Button variant="dark" onClick={handleShow}>Add user</Button>

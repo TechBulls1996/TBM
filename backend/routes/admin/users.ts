@@ -9,13 +9,30 @@ const usersRouter = express.Router();
 type QueryType = { 
     page?: string;
     pageSize?: string;
+    search?: string;
+
 };
 
 usersRouter.get("/", async (req, res) => {
-    const { pageSize = '10', page = '1' }: QueryType = req.query;
+    const { pageSize = '10', page = '1', search }: QueryType = req.query;
     const skip: number = (parseInt(page) - 1) * parseInt(pageSize);
 
     try {
+        let matchQuery = { "roles.type": "user" }; // Default match query
+        if (search) {
+            matchQuery = {
+              $and: [
+                    { "roles.type": "user" },
+                    {
+                        $or: [
+                            { name: { $regex: search, $options: 'i' } },
+                            { email: { $regex: search, $options: 'i' } }
+                            
+                        ]
+                    }
+                ]
+            };
+        }
         const users = await User.aggregate([
             { $sort: { createdAt: -1 } },
             { $skip: skip },
@@ -35,11 +52,16 @@ usersRouter.get("/", async (req, res) => {
                 },
             },
             { $unwind: "$roles" },
-            { $match: { "roles.type": "user" } }
+            { $match: matchQuery }
         ]);
 
         if (users.length === 0) {
-            return res.status(401).json(ApiFailedResponse(FailedMsg));
+            return res.status(200).json({
+                status: true,
+                message: SuccessMsg,
+                data: [],
+                hashNextPage: false,
+            });
         }
 
          // Check if there are more users beyond this page
