@@ -759,6 +759,14 @@ button.like-btn {
   border-radius: 15px;
 }
 
+.log-wrapper {
+  position: fixed;
+  width: 100px;
+  min-height: 50px;
+  background: #00000061;
+  color:#fff;
+}
+
 /* Responsive CSS */
 @media (min-width: 992px) {
   .dropdown:not(.dropdown-hover) .dropdown-menu {

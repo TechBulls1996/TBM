@@ -1,15 +1,10 @@
 import { useEffect, useState, FormEvent } from 'react';
-import { Button, Modal, ButtonGroup } from 'react-bootstrap';
+import { Button, Modal, ButtonGroup, ProgressBar } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-
+import { faEdit, faLink, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import SearchBar from '../../components/common/Search';
-import {
-  GetUsers,
-  UserDelete,
-  UserCreate,
-} from '../../services/ProfileServices';
+import { GetAds, DeleteAd, CreateAd } from '../../services/AdServices';
 import { getErrorMsg } from '../../helpers';
 import MyAlert, { InputErrorMessage } from '../../components/common/Alert';
 import { MyButton } from '../../components/common/MyButton';
@@ -17,25 +12,38 @@ import CountrySelect, {
   CitySelect,
   StateSelect,
 } from '../../components/common/AdvanceSelect';
+import { GetClients } from '../../services/ManageClientServices';
+import Select from 'react-select';
+import { API_URL } from '../../helpers/constant';
 
-const AdminManageUsers = () => {
+const AdminManageAds = () => {
   const [id, setId]: any = useState();
-  const [email, setEmail]: any = useState('');
-  const [password, setPassword]: any = useState('');
-  const [fullName, setFullName]: any = useState('');
-  const [phone, setPhone]: any = useState('');
-  const [gender, setGender]: any = useState('Male');
+  const [client, setClient]: any = useState('');
+  const [video, setVideo]: any = useState('');
+  const [tags, setTags]: any = useState('');
+  const [title, setTitle]: any = useState('');
+  const [count, setCount]: any = useState('');
   const [country, setCountry]: any = useState({
     code: 'IN',
     label: 'India',
     value: 'India',
   });
-  const [state, setState]: any = useState('');
-  const [city, setCity]: any = useState('');
-  const [address, setAddress]: any = useState('');
-  const [pinCode, setPinCode]: any = useState('');
+  const [state, setState]: any = useState({
+    value: 'Haryana',
+    label: 'Haryana',
+    countryCode: 'IN',
+    code: 'HR',
+  });
+  const [city, setCity]: any = useState({
+    value: 'Palwal',
+    label: 'Palwal',
+    countryCode: 'IN',
+    stateCode:'HR'
+  });
+  const [pincode, setPincode]: any = useState('');
 
-  const [users, setUsers]: any = useState([]);
+  const [ads, setAds]: any = useState([]);
+  const [clients, setClients]: any = useState([]);
   const [page, setPage]: any = useState(1);
   const [nextPage, setNextPage]: any = useState(true);
   const [errors, setErrors]: any = useState([]);
@@ -43,29 +51,37 @@ const AdminManageUsers = () => {
   const [show, setShow] = useState(false);
   const [search, setSearch] = useState('');
   const [formStatus, setFormStatus] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const getClientData = async () => {
+    const getClients = await GetClients({ page: 1, pageSize: 500, search: '' });
+    setClients(
+      getClients.data.map((client: any) => ({
+        value: client._id,
+        label: client.name,
+      }))
+    );
+  };
 
   const handleClose = () => {
     setShow(false);
 
-    //reset form again
+    // reset form
     setId(false);
     setFormStatus(false);
-    setEmail('');
-    setFullName('');
-    setPhone('');
-    setPassword('');
-    setAddress('');
-    setPinCode('');
+    setClient('');
+    setTitle('');
+    setTags('');
+    setVideo('');
+    setUploadProgress(0);
   };
 
   const handleShow = () => setShow(true);
 
   const handleDelete = (id: any) => {
-    UserDelete(id).then((res: any) => {
+    DeleteAd(id).then((res: any) => {
       if (res?.status) {
-        //success
-        console.log('User Deleted');
-        //update users table
+        console.log('Ad Deleted');
         handleRequest();
       } else {
         setErrors(res?.errors);
@@ -77,24 +93,25 @@ const AdminManageUsers = () => {
     handleShow();
     setFormStatus(true);
     setId(user._id);
-    //set user fileds
-    setEmail(user.email);
-    setFullName(user.name);
-    setPhone(user.mobile);
-    setPassword('');
+
+    // set user fields
+    setClient({ label: user.client.name, value: user.client._id });
+    setTitle(user.title);
+    setTags(user.tags);
+    setState(user.country);
     setState(user.state);
     setCity(user.city);
-    setAddress(user.address);
-    setPinCode(user.pinCode);
+    setPincode(user.pincode);
+    setCount(user.ad_count_per_day);
   };
 
   const handleRequest = () => {
-    return GetUsers({ page, pageSize, search }).then((res) => {
+    return GetAds({ page, pageSize, search }).then((res) => {
       if (res?.status) {
         if (page === 1) {
-          setUsers(res.data);
+          setAds(res.data);
         } else {
-          setUsers([...users, ...res.data]);
+          setAds([...ads, ...res.data]);
         }
 
         setNextPage(res.nextPage);
@@ -103,35 +120,35 @@ const AdminManageUsers = () => {
         }
       } else {
         setErrors(res?.errors);
-        return false;
       }
     });
   };
 
   const onRegister = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    UserCreate({
-      id,
-      email,
-      password,
-      fullName,
-      phone,
-      gender,
-      country,
-      state,
-      city,
-      address,
-      pinCode,
+    const formData = new FormData();
+    formData.append('id', id);
+    formData.append('client', client.value);
+    formData.append('title', title);
+    formData.append('video', video);
+    formData.append('country', JSON.stringify(country));
+    formData.append('state', JSON.stringify(state));
+    formData.append('city', JSON.stringify(city));
+    formData.append('pincode', pincode);
+    formData.append('tags', tags);
+    formData.append('count', count);
+
+    CreateAd(formData, (progressEvent: any) => {
+      const percentCompleted = Math.round(
+        (progressEvent.loaded * 100) / progressEvent.total
+      );
+      setUploadProgress(percentCompleted);
     }).then((res: any) => {
       if (res?.status) {
-        //reset form again
-        setId(false);
-        setFormStatus(false);
-        setShow(false);
-
-        //update users table
+        handleClose();
         handleRequest();
       } else {
+        console.log(res);
         setErrors(res?.errors);
       }
     });
@@ -139,6 +156,7 @@ const AdminManageUsers = () => {
 
   useEffect(() => {
     handleRequest();
+    getClientData();
   }, [page]);
 
   useEffect(() => {
@@ -149,10 +167,9 @@ const AdminManageUsers = () => {
   }, [search]);
 
   const globalError = getErrorMsg(errors, 'global');
-
   return (
     <>
-      <section className="container container-fluid benefits-section pt-7 pb-7 px-0 ">
+      <section className="container container-fluid benefits-section pt-7 pb-7 px-0">
         <div className="container">
           <div className="row">
             <div className="col-sm-3 p-0">
@@ -166,7 +183,7 @@ const AdminManageUsers = () => {
                       <div className="detailcheck-sec">
                         <div className="row">
                           <div className="col-sm-12">
-                            <label className="form-label">Manage Users:</label>
+                            <label className="form-label">Manage Ads:</label>
                           </div>
                           <div className="col-md-10 mb-4 d-flex">
                             <SearchBar
@@ -177,7 +194,7 @@ const AdminManageUsers = () => {
                           </div>
                           <div className="col-md-2">
                             <Button variant="dark" onClick={handleShow}>
-                              Add user
+                              Create Ad
                             </Button>
                           </div>
                         </div>
@@ -187,27 +204,49 @@ const AdminManageUsers = () => {
                         <MyAlert message={globalError} alertType="danger" />
                       )}
                       <div className="table-wrap w-100">
-                        <table className="table table-responsive">
+                        <table
+                          className="table table-responsive"
+                          style={{ overflowY: 'scroll' }}
+                        >
                           <thead>
                             <tr>
                               <td className="head">Sno</td>
-                              <td className="head">Name</td>
-                              <td className="head">Email</td>
-                              <td className="head">Mobile</td>
-                              <td className="head">Address</td>
-                              <td className="head">Pincode</td>
+                              <td className="head">Title</td>
+                              <td className="head">Count</td>
+                              <td className="head">City</td>
+                              <td className="head">Tags</td>
+                              <td className="head">Video</td>
+                              <td className="head">Client</td>
                               <td className="head"></td>
                             </tr>
                           </thead>
                           <tbody>
-                            {users?.map((user: any, index: number) => (
+                            {ads?.map((user: any, index: number) => (
                               <tr key={index}>
-                                <td> {++index}</td>
-                                <td>{user.name}</td>
-                                <td>{user.email}</td>
-                                <td>{user.mobile}</td>
-                                <td>{user.city.value}</td>
-                                <td>{user.pinCode}</td>
+                                <td>{index + 1}</td>
+                                <td>{user.title}</td>
+                                <td>{user.ad_count_per_day}</td>
+                                <td>
+                                  {user.city.value +
+                                    ', ' +
+                                    user.state.value +
+                                    ', ' +
+                                    user.country.code +
+                                    ' - ' +
+                                    user.pincode}
+                                </td>
+                                <td>
+                                  <code>{user.tags}</code>
+                                </td>
+                                <td>
+                                  <a
+                                    href={API_URL + '/' + user.video}
+                                    target="_blank"
+                                  >
+                                    {' '}
+                                    <FontAwesomeIcon icon={faLink} />{' '}
+                                  </a>
+                                </td>
                                 <td>
                                   <ButtonGroup aria-label="User Actions">
                                     <Button
@@ -234,7 +273,7 @@ const AdminManageUsers = () => {
                           </tbody>
                         </table>
                         {nextPage && (
-                          <div className="col-sm-12 text-center ">
+                          <div className="col-sm-12 text-center">
                             <MyButton
                               text="Load More"
                               afterText="Load More"
@@ -254,12 +293,14 @@ const AdminManageUsers = () => {
         </div>
       </section>
 
-      {/* Create User Modal */}
       <Modal show={show} onHide={handleClose} size={'lg'}>
         <Modal.Header closeButton>
-          <Modal.Title>{formStatus ? 'Update' : 'Create'} User</Modal.Title>
+          <Modal.Title>{formStatus ? 'Update' : 'Create'} Ads</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+        {globalError?.length > 0 && (
+              <MyAlert message={globalError} alertType="danger" />
+            )}
           <form
             className="row g-3"
             onSubmit={(e) => onRegister(e)}
@@ -269,82 +310,47 @@ const AdminManageUsers = () => {
               <input
                 type="text"
                 className="form-control"
-                id="fullname"
-                name="fullname"
-                placeholder="Enter Full Name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                id="title"
+                name="title"
+                placeholder="Enter Ad Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
               <InputErrorMessage
-                message={getErrorMsg(errors, 'name')}
+                message={getErrorMsg(errors, 'title')}
+                alertType="danger"
+              />
+            </div>
+            <div className="col-md-6">
+              <Select
+                options={clients}
+                name="client"
+                id="client"
+                defaultValue={client}
+                onChange={(e: any) => setClient(e)}
+                placeholder="Select Client"
+              />
+              <InputErrorMessage
+                message={getErrorMsg(errors, 'client')}
                 alertType="danger"
               />
             </div>
             <div className="col-md-6">
               <input
-                type="email"
+                type="number"
                 className="form-control"
-                id="email"
-                name="email"
-                placeholder="Enter Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="count"
+                name="count"
+                placeholder="Enter Ad run count per day"
+                value={count}
+                onChange={(e) => setCount(e.target.value)}
               />
               <InputErrorMessage
-                message={getErrorMsg(errors, 'email')}
+                message={getErrorMsg(errors, 'count')}
                 alertType="danger"
               />
             </div>
-            <div className="col-md-6">
-              <input
-                type=""
-                className="form-control"
-                id="number"
-                name="number"
-                placeholder="Enter phone no."
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-              <InputErrorMessage
-                message={getErrorMsg(errors, 'mobile')}
-                alertType="danger"
-              />
-            </div>
-            <div className="col-md-6">
-              <input
-                type="password"
-                className="form-control"
-                id="password"
-                name="password"
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <InputErrorMessage
-                message={getErrorMsg(errors, 'password')}
-                alertType="danger"
-              />
-            </div>
-            <div className="col-md-6">
-              <select
-                className="form-control"
-                name="gender"
-                id="gender"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-              >
-                <option value="" disabled={true}>
-                  Select Gender
-                </option>
-                <option>Male</option>
-                <option>Female</option>
-                <option>Other</option>
-              </select>
-              <InputErrorMessage
-                message={getErrorMsg(errors, 'gender')}
-                alertType="danger"
-              />
-            </div>
+
             <div className="col-md-6">
               <CountrySelect
                 name="country"
@@ -374,8 +380,8 @@ const AdminManageUsers = () => {
             </div>
             <div className="col-md-6">
               <CitySelect
-                name="state"
-                id="state"
+                name="city"
+                id="city"
                 state={state}
                 defaultValue={city}
                 onChange={(e: any) => setCity(e)}
@@ -386,39 +392,62 @@ const AdminManageUsers = () => {
                 alertType="danger"
               />
             </div>
-            <div className="col-md-6">
-              <input
-                type="text"
-                className="form-control"
-                id="address"
-                name="address"
-                placeholder="Local Address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-              />
-              <InputErrorMessage
-                message={getErrorMsg(errors, 'address')}
-                alertType="danger"
-              />
-            </div>
-            <div className="col-md-6">
+            <div className="col-md-4">
               <input
                 type="number"
                 className="form-control"
                 id="pincode"
                 name="pincode"
-                placeholder="Pin Code"
-                value={pinCode}
-                onChange={(e) => setPinCode(e.target.value)}
+                placeholder="Enter Pincode"
+                value={pincode}
+                onChange={(e) => setPincode(e.target.value)}
               />
               <InputErrorMessage
-                message={getErrorMsg(errors, 'pinCode')}
+                message={getErrorMsg(errors, 'pincode')}
                 alertType="danger"
               />
             </div>
+            <div className="col-md-8">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Add Tags like: Palwal, Faridabad, Hodal etc"
+                id="tags"
+                name="tags"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+              />
+              <InputErrorMessage
+                message={getErrorMsg(errors, 'tags')}
+                alertType="danger"
+              />
+            </div>
+            <div className="col-md-6">
+              <label>Select Video </label>
+              <input
+                type="file"
+                className="form-control"
+                id="video"
+                name="video"
+                onChange={(e) => setVideo(e?.target?.files?.[0])}
+              />
+              <InputErrorMessage
+                message={getErrorMsg(errors, 'video')}
+                alertType="danger"
+              />
+            </div>
+            <div className="col-md-12 pb-3">
+              {uploadProgress > 0 && (
+                <ProgressBar
+                  now={uploadProgress}
+                  label={`${uploadProgress}%`}
+                  animated
+                />
+              )}
+            </div>
             <div className="col-12">
               <button type="submit" className="btn btn-primary">
-                {formStatus ? 'Update' : 'Create'} user
+                {formStatus ? 'Update' : 'Create'}
               </button>
             </div>
           </form>
@@ -427,4 +456,5 @@ const AdminManageUsers = () => {
     </>
   );
 };
-export default AdminManageUsers;
+
+export default AdminManageAds;

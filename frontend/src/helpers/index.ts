@@ -21,7 +21,8 @@ export const setServiceHeaders = () => {
   const token = localStorage.getItem("auth");
   return {
     headers: {
-      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
     },
   };
 };

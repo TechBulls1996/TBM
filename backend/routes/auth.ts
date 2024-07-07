@@ -55,7 +55,7 @@ authRouter.post(
         token: user.authToken,
         user,
       });
-    } else if (user && !user.status) {
+    } else if (!req.body.id && user && !user.status) {
       return res.status(401).json({
         status: false,
         errors: [

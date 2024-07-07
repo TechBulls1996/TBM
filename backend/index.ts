@@ -5,6 +5,7 @@ import cors from "cors";
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const routes = require("./routes/index");
+
 dotenv.config();
 
 const app = express();
@@ -33,6 +34,9 @@ try {
 app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
+// Middleware for parsing application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 // Enable CORS for all routes
 const allowedOrigins = 'http://localhost';  

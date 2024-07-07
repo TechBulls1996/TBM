@@ -99,3 +99,16 @@ export const ApiFailedResponse = (message: any, param: any = "global") => {
     ],
   };
 };
+
+export const formatNumber = (num: number) => {
+  return num.toString().padStart(2, '0');
+};
+
+// Helper function to calculate percentage increase
+export const calculatePercentageIncrease = (current:number, previous:number) => {
+  if (previous === 0) {
+    return "100%";
+  }
+  return ((current - previous) / previous * 100).toFixed(2) + '%';
+};
+

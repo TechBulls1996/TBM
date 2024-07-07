@@ -10,8 +10,8 @@ import Footer from "../components/Footer";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Loader from "../components/common/Loader";
-import Dashboard from "../pages/user/Dasboard";
-import Records from "../pages/user/Records";
+// import Dashboard from "../pages/user/Dasboard";
+// import Records from "../pages/user/Records";
 import Blogs from "../pages/Blogs";
 import Logout from "../pages/Logout";
 import ForgotPassword from "../pages/ForgotPassword";
@@ -20,6 +20,7 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminManageClients from "../pages/admin/AdminManageClients";
 import AdminManageUsers from "../pages/admin/AdminManageUsers";
 import OuterHeader from "../components/OuterHeader";
+import AdminManageAds from "../pages/admin/AdminManageAds";
 
 
 const useAuth = () => {
@@ -38,9 +39,7 @@ const MainLayout = () => {
   const location = useLocation();
   const isAdmin = isAuthenticated && isAuthenticated?.role === "admin";
 
-  /*
-   Remove auth for now - Temporary
-
+  
   //check auth
   if(!isAuthenticated) {
     return <Navigate to="/login" />
@@ -55,10 +54,10 @@ const MainLayout = () => {
   if (location.pathname.startsWith("/user") && isAdmin) {
     return <Navigate to="/" />;
   }
-  */
+  
 
   //hide routes header, sidebar or footer
-  const routesToHide = ["/user/play"];
+  const routesToHide = ["/user/play","/user"];
   const hidenRoutes = routesToHide.some(route =>
     location.pathname.startsWith(route)
   );
@@ -131,22 +130,22 @@ const ROUTES = [
     children: [
       {
         path: "",
-        element: <Dashboard />,
+        element: <Play />,
         index: true,
       },
-      {
-        path: "dashboard",
-        element: <Dashboard />,
-      },
+      // {
+      //   path: "dashboard",
+      //   element: <Dashboard />,
+      // },
       {
         path: "play",
         element: <Play />,
       },
       
-      {
-        path: "records",
-        element: <Records />,
-      },
+      // {
+      //   path: "records",
+      //   element: <Records />,
+      // },
       
     ],
   },
@@ -174,6 +173,10 @@ const ROUTES = [
       {
         path: "users",
         element: <AdminManageUsers />,
+      },
+      {
+        path: "ads",
+        element: <AdminManageAds />,
       },
       
     ],

@@ -128,9 +128,9 @@ const Header = () => {
                           >
                             <span className="user-pic ">
                               <img
-                                alt={authState?.user.name}
+                                alt={authState?.user?.name}
                                 id="user-pic"
-                                src={authState?.user.image || dummyImg}
+                                src={authState?.user?.image || dummyImg}
                               />
                             </span>
                             <span>

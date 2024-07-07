@@ -1,10 +1,10 @@
 import express from "express";
 import { FailedMsg, SuccessMsg } from "../../helper/messages";
-import { generatePassword } from "../../helper/auth";
-import { registerValidate } from "../../helper/validations/authValidation";
+//import { generatePassword } from "../../helper/auth";
+import { clientRegisterValidate } from "../../helper/validations/authValidation";
 
-const User = require('../../db/models/User');
-const usersRouter = express.Router();
+const Client = require('../../db/models/Client');
+const clientsRouter = express.Router();
 
 type QueryType = { 
     page?: string;
@@ -12,10 +12,10 @@ type QueryType = {
     search?: string;
 };
 
-usersRouter.post("/delete", async (req: any, res: any) => {
+clientsRouter.post("/delete", async (req: any, res: any) => {
     const {id} = req.body;
     try {
-      const deletedUser = await User.findByIdAndDelete(id);
+      const deletedUser = await Client.findByIdAndDelete(id);
       if (deletedUser) {
         res.status(200).json({
             status: true,
@@ -33,56 +33,31 @@ usersRouter.post("/delete", async (req: any, res: any) => {
     return false;
   });
 
-usersRouter.post("/create", registerValidate, async (req: any, res: any) => {
+clientsRouter.post("/create", clientRegisterValidate, async (req: any, res: any) => {
     const {
       id,  
       fullName,
       email,
-      password,
       phone,
-      dob,
-      gender,
-      bloodGroup,
-      country,
-      state,
-      city,
       address,
-      pinCode,
     } = req.body;
     try {
-      const passwordHash = await generatePassword(password);
       let user;
       if(!id){ 
-        user = await User.create({
+        user = await Client.create({
             name: fullName,
             email,
-            password: passwordHash,
             mobile: phone,
-            dob,
-            gender,
-            bloodGroup,
-            country,
-            state,
-            city,
             address,
-            pinCode,
         });
       }else{
-        user = await User.findOneAndUpdate(
+        user = await Client.findOneAndUpdate(
             { _id: id },
             {
               name: fullName,
               email,
-              password: passwordHash,
               mobile: phone,
-              dob,
-              gender,
-              bloodGroup,
-              country,
-              state,
-              city,
               address,
-              pinCode,
             },
             { new: true }
           );
@@ -104,27 +79,22 @@ usersRouter.post("/create", registerValidate, async (req: any, res: any) => {
     return false;
   });
 
-usersRouter.get("/", async (req, res) => {
+clientsRouter.get("/", async (req, res) => {
     const { pageSize = '10', page = '1', search }: QueryType = req.query;
     const skip: number = (parseInt(page) - 1) * parseInt(pageSize);
     try {
-        let matchQuery: any = { "roles.type": "user" }; 
+        let matchQuery:any = {}; 
         if (search) {
             matchQuery = {
-              $and: [
-                    { "roles.type": "user" },
-                    {
-                        $or: [
-                            { name: { $regex: search, $options: 'i' } },
-                            { email: { $regex: search, $options: 'i' } }
-                            
-                        ]
-                    }
+                $or: [
+                    { name: { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } },
+                    { address: { $regex: search, $options: 'i' } }
                 ]
             };
         }
-
-        const users = await User.aggregate([
+        
+        const clients = await Client.aggregate([
             { $sort: { createdAt: -1 } },
             { $skip: skip },
             { $limit: parseInt(pageSize) },
@@ -142,11 +112,10 @@ usersRouter.get("/", async (req, res) => {
                     mobile: 1,
                 },
             },
-            { $unwind: "$roles" },
             { $match: matchQuery }
         ]);
-
-        if (users.length === 0) {
+        
+        if (clients.length === 0) {
             return res.status(200).json({
                 status: true,
                 message: SuccessMsg,
@@ -156,12 +125,12 @@ usersRouter.get("/", async (req, res) => {
         }
 
          // Check if there are more users beyond this page
-         const hasNextPage = users.length === parseInt(pageSize);
+         const hasNextPage = clients.length === parseInt(pageSize);
 
         return res.json({
             status: true,
             message: SuccessMsg,
-            data: users,
+            data: clients,
             hasNextPage,
         });
     } catch (error) {
@@ -173,4 +142,4 @@ usersRouter.get("/", async (req, res) => {
     }
 });
 
-module.exports = usersRouter;
+module.exports = clientsRouter;

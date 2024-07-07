@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
+import { CreateAdEvent, GetUserAds, GetUserEventInfo } from '../../services/CommanServices';
+import { useNavigate } from "react-router-dom";
 
 const Play = () => {
   const [playing, setPlaying] = useState(true);
@@ -7,35 +9,65 @@ const Play = () => {
   const [timerSeconds, setTimerSeconds] = useState(5);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
+  const [playedDuration, setPlayedDuration] = useState(0);
   const playerRef = useRef<ReactPlayer | null>(null);
 
-  const videoUrls = [
-    '/mov_bbb.mp4',
-  ];
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [videoUrls, setVideoUrls]:any = useState([]);
+  const [exceedAds, setexceedAds]: any = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // Pause video when tab is switched or minimized
         setPlaying(false);
+        trackVideoEvent('paused');
       } else {
         // Resume video when tab is in focus
         setPlaying(true);
+        trackVideoEvent('resumed');
       }
     };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
-
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.error('Error getting user location:', error);
+      }
+    );
+
+    //get count data
+    GetUserAds({}).then((res) => {
+      if (res?.status) {
+        setVideoUrls(res.data);
+      } 
+    });
+
+  }, []);
+
+  useEffect(() => {
+    //filter videoUrls
+    const updatedVideoUrls = videoUrls.filter((video: any) => !exceedAds.includes(video._id));
+    setVideoUrls(updatedVideoUrls);
+  }, [exceedAds]);
+  
   const handleVideoEnd = () => {
     // Handle video end event, e.g., play the next video
-    console.log('Video ended');
     // You may want to update video logs using an API here
-
+    trackVideoEvent('ended');
     // For demonstration, play the next video
     playNextVideo();
   };
@@ -53,7 +85,7 @@ const Play = () => {
     if (loadedSeconds > 0 && loadedSeconds !== videoDuration) {
       setVideoDuration(loadedSeconds);
     }
-
+     setPlayedDuration(playedSeconds);
     // Check if the remaining time is less than 5 seconds
     if (videoDuration - playedSeconds <= 5) {
       setShowTimer(true);
@@ -64,13 +96,47 @@ const Play = () => {
 
   };
 
+  const trackVideoEvent = async (eventName: string) => {
+    // Implement logic to track video events, e.g., send API request with event data
+    console.log('Tracking video event:', eventName);
+    try {
+      const currentVideo = videoUrls[currentVideoIndex]?._id;
+      const createEvent = await CreateAdEvent({
+                eventName,
+                videoId:currentVideo,
+                userLocation,
+                timestamp: new Date().toISOString(),
+                videoDuration,
+                playedDuration,
+              });
+      
+      if (!createEvent.status && createEvent.errors?.[0]?.message === "Authentication Failed, Please Login again.") {
+          navigate("/login");
+      }
+      //limit per exceed
+      if(!createEvent.status && createEvent.error==='Ad count per day limit exceeded'){
+        const adData = [...exceedAds, currentVideo];
+        setexceedAds(adData);
+      }
+
+      //get event info
+      if(eventName==='ended'){
+        const eventInfo = await GetUserEventInfo();
+      }
+    } catch (error) {
+      console.log('ERROR:::', error);
+      navigate("/login");
+    }
+  
+  };
+
   const playNextVideo = () => {
     // Increment the current video index
     const nextIndex = (currentVideoIndex + 1) % videoUrls.length;
-
     // For demonstration, play the next video
     setCurrentVideoIndex(nextIndex);
     setVideoDuration(0); // Reset video duration
+    setPlayedDuration(0);
     playerRef.current?.seekTo(0);
     setPlaying(true);
   };
@@ -87,9 +153,11 @@ const Play = () => {
 
   return (
     <>
+      <div className='log-wrapper'>
+      </div>
       <ReactPlayer
         ref={playerRef}
-        url={videoUrls[currentVideoIndex]}
+        url={ videoUrls[currentVideoIndex]?.video?.replace(/\\/g, '/') }
         playing={playing}
         controls={true} 
         width="100%"

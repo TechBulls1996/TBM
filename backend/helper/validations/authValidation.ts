@@ -25,24 +25,55 @@ export const emailValidate = [
   validationErrorHandler,
 ];
 
-export const registerValidate = [
+export const clientRegisterValidate = [
+  check('fullname')
+    .isEmpty()
+    .trim()
+    .escape()
+    .withMessage("Full Name is Required."),
+  check('phone')
+    .not()
+    .isEmpty()
+    .trim()
+    .escape()
+    .withMessage("Phone number is Required."),
+  check('address')
+    .not()
+    .isEmpty()
+    .trim()
+    .escape()
+    .withMessage('Address is Required.'),     
+  check('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage("Invalid email address!"),
+   
+  validationErrorHandler,
+];
+
+export const registerValidate =  [
   // username must be an email
   check("email")
     .isEmail()
     .normalizeEmail()
     .withMessage("Invalid email address!"),
   // password must be at least 5 chars long
-  check("password")
-    .isLength({ min: 6 })
-    .withMessage("Password should be strong and valid."),
-
-  check("confirmPass").custom((value: any, { req }: any) => {
-    if (value !== req.body.password) {
-      throw new Error("Password confirmation does not match password");
-    }
-    // Indicates the success of this synchronous custom validator
-    return true;
-  }),
+    check("password")
+    .custom((value: any, { req }:any) => {
+      // Check if ID is not present in the request
+      if (!req.body.id && !value && value.length < 6) {
+        throw new Error("Password should be strong and valid.");
+      }
+      return true;
+    }),
+    
+  // check("confirmPass").custom((value: any, { req }: any) => {
+  //   if (value !== req.body.password) {
+  //     throw new Error("Password confirmation does not match password");
+  //   }
+  //   // Indicates the success of this synchronous custom validator
+  //   return true;
+  // }),
   check("fullName")
     .not()
     .isEmpty()
@@ -57,9 +88,7 @@ export const registerValidate = [
     .withMessage("Valid Phone Number is Required.")
     .isLength({ min: 10 }),
 
-  check("dob").notEmpty().withMessage("Date of Birth is required."),
   check("gender").notEmpty().withMessage("Gender is required."),
-  check("bloodGroup").notEmpty().withMessage("Blood Group is required."),
   check("country").notEmpty().withMessage("Country is required."),
   check("state").notEmpty().withMessage("State is required."),
   check("city").notEmpty().withMessage("City is required."),
