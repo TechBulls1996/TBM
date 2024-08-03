@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 import { CreateAdEvent, GetUserAds, GetUserEventInfo } from '../../services/CommanServices';
 import { useNavigate } from "react-router-dom";
+import { secondsToHMS } from '../../helpers';
 
 const Play = () => {
   const [playing, setPlaying] = useState(true);
@@ -11,10 +12,12 @@ const Play = () => {
   const [videoDuration, setVideoDuration] = useState(0);
   const [playedDuration, setPlayedDuration] = useState(0);
   const playerRef = useRef<ReactPlayer | null>(null);
+  //user screen Time
+  const [screenTime, setScreenTime]:any = useState(0);
 
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [videoUrls, setVideoUrls]:any = useState([]);
-  const [exceedAds, setexceedAds]: any = useState([]);
+  const [exceedAds, setexceedAds]:any = useState([]);
 
   const navigate = useNavigate();
 
@@ -49,10 +52,13 @@ const Play = () => {
       }
     );
 
-    //get count data
-    GetUserAds({}).then((res) => {
+    //get ads data
+    GetUserAds({}).then(async (res) => {
       if (res?.status) {
         setVideoUrls(res.data);
+        //get screen Time of user
+        const eventInfo = await GetUserEventInfo();
+        setScreenTime(eventInfo?.screen?.screenTime || 0);
       } 
     });
 
@@ -86,6 +92,8 @@ const Play = () => {
       setVideoDuration(loadedSeconds);
     }
      setPlayedDuration(playedSeconds);
+     let sTime= screenTime+1;
+     setScreenTime(sTime);
     // Check if the remaining time is less than 5 seconds
     if (videoDuration - playedSeconds <= 5) {
       setShowTimer(true);
@@ -122,6 +130,7 @@ const Play = () => {
       //get event info
       if(eventName==='ended'){
         const eventInfo = await GetUserEventInfo();
+        setScreenTime(eventInfo?.screen?.screenTime || 0);
       }
     } catch (error) {
       console.log('ERROR:::', error);
@@ -154,6 +163,7 @@ const Play = () => {
   return (
     <>
       <div className='log-wrapper'>
+        <span>{secondsToHMS(Math.round(screenTime))}</span>
       </div>
       <ReactPlayer
         ref={playerRef}

@@ -19,6 +19,10 @@ const Login = () => {
 
   const onLogin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    //clear storage
+    localStorage.clear();
+    document.cookie = "";
+
     UserLogin({ email, password })
       .then((res) => {
         if (res?.status) {

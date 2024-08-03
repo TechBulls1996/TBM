@@ -145,8 +145,7 @@ userRouter.post("/events", extractDeviceInfo, async (req: any, res: any) => {
   }
 });
 
-
-userRouter.get('/event/info', extractDeviceInfo, async (req, res) => {
+userRouter.get("/event/info", extractDeviceInfo, async (req, res) => {
   try {
     const auth = getRequestAuth(req);
     // Get the start and end of today
@@ -160,18 +159,18 @@ userRouter.get('/event/info', extractDeviceInfo, async (req, res) => {
         $match: {
           userId: new mongoose.Types.ObjectId(auth.userId),
           eventType: "ended",
-          createdAt: { $gte: startOfDay, $lte: endOfDay }
-        }
+          createdAt: { $gte: startOfDay, $lte: endOfDay },
+        },
       },
       {
         $group: {
           _id: {
             adId: "$adId",
-            userId: "$userId"
+            userId: "$userId",
           },
           count: { $sum: 1 },
-          event: { $first: "$$ROOT" }
-        }
+          event: { $first: "$$ROOT" },
+        },
       },
       {
         $project: {
@@ -179,22 +178,29 @@ userRouter.get('/event/info', extractDeviceInfo, async (req, res) => {
           adId: "$_id.adId",
           eventType: "$event.eventType",
           createdAt: "$event.createdAt",
-          count: 1
-        }
-      }
+          duration: "$event.videoInfo.duration",
+          count: 1,
+        },
+      },
     ]);
 
     if (!userEvents.length) {
-      return res.status(404).json({ success: false, error: 'No events found' });
+      return res.status(404).json({ success: false, error: "No events found" });
     }
 
-    res.status(200).json({ success: true, events: userEvents });
+    const totalScreenTime = userEvents.reduce((acc: any, event: any) => acc + event.duration * event.count,0);
+    res.status(200).json({
+        success: true,
+        events: userEvents,
+        screen: { screenTime: totalScreenTime, unit: 'seconds' },
+      });
   } catch (error) {
     console.error("Error retrieving user events:", error);
-    res.status(500).json({ success: false, error: "Error retrieving user events" });
+    res
+      .status(500)
+      .json({ success: false, error: "Error retrieving user events" });
   }
 });
-
 
 userRouter.get("/ads", async (req: any, res: any) => {
   const {

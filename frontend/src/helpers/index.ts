@@ -38,3 +38,11 @@ export const getUserRole = () => {
 export const getTimeAgo = (time: any) => {
   return moment(time).fromNow();
 };
+
+//convert time from seconds to hh:mm:ss
+export const secondsToHMS = (seconds: number) => {
+  const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+  const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+  const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+  return `${h}:${m}:${s}`;
+};

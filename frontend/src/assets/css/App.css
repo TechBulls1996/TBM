@@ -760,11 +760,16 @@ button.like-btn {
 }
 
 .log-wrapper {
-  position: fixed;
-  width: 100px;
-  min-height: 50px;
-  background: #00000061;
-  color:#fff;
+    position: fixed;
+    min-width: 100px;
+    min-height: 50px;
+    background: #00000061;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding:5px;
 }
 
 /* Responsive CSS */
