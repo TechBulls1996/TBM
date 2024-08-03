@@ -7,10 +7,10 @@
       "backend"
     ],
     "scripts": {
-      "frontend": "yarn workspace frontend start",
-      "backend:build": "yarn workspace backend build",
-      "backend:start": "yarn workspace backend start",
-      "backend:dev": "yarn workspace backend dev",
+      "frontend": "npm --workspace frontend start",
+      "backend:build": "npm --workspace backend build",
+      "backend:start": "npm --workspace backend start",
+      "backend:dev": "npm --workspace backend dev",
       "start": "node start.js"
     },
     "dependencies": {

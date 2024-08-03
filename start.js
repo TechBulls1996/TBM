@@ -89,11 +89,11 @@ concurrently(
       name: 'frontend',
       prefixColor: 'green',
     },
-    // {
-    //   command: 'npm run backend:dev',
-    //   name: 'backend',
-    //   prefixColor: 'blue',
-    // },
+    {
+      command: 'npm run backend:start',
+      name: 'backend',
+      prefixColor: 'blue',
+    },
   ],
   {
     handleInput: true,  // Handle input/output streams
