@@ -1,1 +1,14 @@
 #True Digital Brodcasting
+
+# ====================================
+# Running frontend and Backend Servers
+# ====================================
+
+yarn workspace frontend start
+# or if using npm
+npm --workspace frontend run start
+
+
+yarn workspace backend dev
+# or if using npm
+npm --workspace backend run dev

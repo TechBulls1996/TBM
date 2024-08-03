@@ -1,0 +1,32 @@
+{
+    "name": "my-project",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+      "frontend",
+      "backend"
+    ],
+    "scripts": {
+      "frontend": "yarn workspace frontend start",
+      "backend:build": "yarn workspace backend build",
+      "backend:start": "yarn workspace backend start",
+      "backend:dev": "yarn workspace backend dev",
+      "start": "node start.js"
+    },
+    "dependencies": {
+      "concurrently": "^8.2.2",
+      "cross-env": "^7.0.3",
+      "serve": "^14.2.0", 
+      "moment": "^2.29.4"
+    },
+    "devDependencies": {
+      "nodemon": "^3.0.1",
+      "typescript": "4.9.5",
+      "ts-node": "^10.9.1",
+      "prettier": "^3.0.3",
+      "eslint": "^8.50.0", 
+      "eslint-config-prettier": "^8.5.0",  
+      "eslint-plugin-prettier": "^5.0.0"  
+    }
+  }
+  
